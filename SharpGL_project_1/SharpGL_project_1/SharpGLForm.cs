@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpGL;
+using SharpGL.SceneGraph.Primitives;
 
 namespace SharpGL_project_1
 {
@@ -42,7 +43,73 @@ namespace SharpGL_project_1
             //  Rotate around the Y axis.
             gl.Rotate(rotation, 0.0f, 1.0f, 0.0f);
 
-            //  Draw a coloured pyramid.
+            //gl.Begin(OpenGL.GL_TRIANGLES);
+
+
+            DrawSportsHall(gl);
+
+            //  Nudge the rotation.
+            if (_sceneIsRotating)
+            {
+                rotation += 3.0f;
+            }
+        }
+
+        /// <summary>
+        /// Draw sports hall in the shape of a cuboid
+        /// </summary>
+        /// <param name="gl">openGL object</param>
+        private void DrawSportsHall(OpenGL gl)
+        {
+            gl.Begin(OpenGL.GL_QUADS);
+            
+            //green
+            gl.Color(0.0f, 1.0f, 0.0f);
+            gl.Vertex(1.0f, 1.0f, -3.0f);
+            gl.Vertex(-1.0f, 1.0f, -3.0f);
+            gl.Vertex(-1.0f, 1.0f, 1.0f);
+            gl.Vertex(1.0f, 1.0f, 1.0f);
+
+            //orange
+            gl.Color(1.0f, 0.5f, 0.0f);
+            gl.Vertex(1.0f, -1.0f, 1.0f);
+            gl.Vertex(-1.0f, -1.0f, 1.0f);
+            gl.Vertex(-1.0f, -1.0f, -3.0f);
+            gl.Vertex(1.0f, -1.0f, -3.0f);
+
+            //red
+            gl.Color(1.0f, 0.0f, 0.0f);
+            gl.Vertex(1.0f, 1.0f, 1.0f);
+            gl.Vertex(-1.0f, 1.0f, 1.0f);
+            gl.Vertex(-1.0f, -1.0f, 1.0f);
+            gl.Vertex(1.0f, -1.0f, 1.0f);
+
+            //yellow
+            gl.Color(1.0f, 1.0f, 0.0f);
+            gl.Vertex(1.0f, -1.0f, -3.0f);
+            gl.Vertex(-1.0f, -1.0f, -3.0f);
+            gl.Vertex(-1.0f, 1.0f, -3.0f);
+            gl.Vertex(1.0f, 1.0f, -3.0f);
+
+            //blue
+            gl.Color(0.0f, 0.0f, 1.0f);
+            gl.Vertex(-1.0f, 1.0f, 1.0f);
+            gl.Vertex(-1.0f, 1.0f, -3.0f);
+            gl.Vertex(-1.0f, -1.0f, -3.0f);
+            gl.Vertex(-1.0f, -1.0f, 1.0f);
+
+            //pink
+            gl.Color(1.0f, 0.0f, 1.0f);
+            gl.Vertex(1.0f, 1.0f, -3.0f);
+            gl.Vertex(1.0f, 1.0f, 1.0f);
+            gl.Vertex(1.0f, -1.0f, 1.0f);
+            gl.Vertex(1.0f, -1.0f, -3.0f);
+
+            gl.End();
+        }
+
+        private void drawColouredPyramid(OpenGL gl)
+        {
             gl.Begin(OpenGL.GL_TRIANGLES);
             gl.Color(1.0f, 0.0f, 0.0f);
             gl.Vertex(0.0f, 1.0f, 0.0f);
@@ -50,18 +117,21 @@ namespace SharpGL_project_1
             gl.Vertex(-1.0f, -1.0f, 1.0f);
             gl.Color(0.0f, 0.0f, 1.0f);
             gl.Vertex(1.0f, -1.0f, 1.0f);
+
             gl.Color(1.0f, 0.0f, 0.0f);
             gl.Vertex(0.0f, 1.0f, 0.0f);
             gl.Color(0.0f, 0.0f, 1.0f);
             gl.Vertex(1.0f, -1.0f, 1.0f);
             gl.Color(0.0f, 1.0f, 0.0f);
             gl.Vertex(1.0f, -1.0f, -1.0f);
+
             gl.Color(1.0f, 0.0f, 0.0f);
             gl.Vertex(0.0f, 1.0f, 0.0f);
             gl.Color(0.0f, 1.0f, 0.0f);
             gl.Vertex(1.0f, -1.0f, -1.0f);
             gl.Color(0.0f, 0.0f, 1.0f);
             gl.Vertex(-1.0f, -1.0f, -1.0f);
+
             gl.Color(1.0f, 0.0f, 0.0f);
             gl.Vertex(0.0f, 1.0f, 0.0f);
             gl.Color(0.0f, 0.0f, 1.0f);
@@ -69,9 +139,6 @@ namespace SharpGL_project_1
             gl.Color(0.0f, 1.0f, 0.0f);
             gl.Vertex(-1.0f, -1.0f, 1.0f);
             gl.End();
-
-            //  Nudge the rotation.
-            rotation += 3.0f;
         }
 
 
@@ -84,6 +151,10 @@ namespace SharpGL_project_1
         private void openGLControl_OpenGLInitialized(object sender, EventArgs e)
         {
             //  TODO: Initialise OpenGL here.
+
+            //Initialise screen size
+            Width = 1024;
+            Height = 720;
 
             //  Get the OpenGL object.
             OpenGL gl = openGLControl.OpenGL;
@@ -124,5 +195,18 @@ namespace SharpGL_project_1
         /// The current rotation.
         /// </summary>
         private float rotation = 0.0f;
+
+        private bool _sceneIsRotating = true;
+
+        private void openGLControl_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
+            {
+                case (char)80: //P- pause animation
+                case (char)112:
+                    _sceneIsRotating = !_sceneIsRotating;
+                    break;
+            }
+        }
     }
 }
