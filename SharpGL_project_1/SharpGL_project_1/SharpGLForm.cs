@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Windows.Forms;
 using SharpGL;
+using SharpGL.Enumerations;
 using SharpGL.SceneGraph.Primitives;
 
 namespace SharpGL_project_1
@@ -31,6 +33,8 @@ namespace SharpGL_project_1
         /// <param name="e">The <see cref="RenderEventArgs"/> instance containing the event data.</param>
         private void openGLControl_OpenGLDraw(object sender, RenderEventArgs e)
         {
+            openGLControl_Resized(null, null);
+
             //  Get the OpenGL object.
             OpenGL gl = openGLControl.OpenGL;
 
@@ -42,16 +46,14 @@ namespace SharpGL_project_1
 
             //  Rotate around the Y axis.
             gl.Rotate(rotation, 0.0f, 1.0f, 0.0f);
-
-            //gl.Begin(OpenGL.GL_TRIANGLES);
-
-
+            
             DrawSportsHall(gl);
 
             //  Nudge the rotation.
             if (_sceneIsRotating)
             {
                 rotation += 3.0f;
+                //z += 0.1f;
             }
         }
 
@@ -153,7 +155,7 @@ namespace SharpGL_project_1
             //  TODO: Initialise OpenGL here.
 
             //Initialise screen size
-            Width = 1024;
+            Width = 1280;
             Height = 720;
 
             //  Get the OpenGL object.
@@ -182,10 +184,10 @@ namespace SharpGL_project_1
             gl.LoadIdentity();
 
             //  Create a perspective transformation.
-            gl.Perspective(60.0f, (double)Width / (double)Height, 0.01, 100.0);
+            gl.Perspective(45.0f, (double)Width / (double)Height, 0.01, 100.0);
 
             //  Use the 'look at' helper function to position and aim the camera.
-            gl.LookAt(-5, 5, -5, 0, 0, 0, 0, 1, 0);
+            gl.LookAt(-5, -5, z, 0, 0, 0, 0, 1, 0);
 
             //  Set the modelview matrix.
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
@@ -196,6 +198,8 @@ namespace SharpGL_project_1
         /// </summary>
         private float rotation = 0.0f;
 
+        private float z = -5.0f;
+
         private bool _sceneIsRotating = true;
 
         private void openGLControl_KeyPress(object sender, KeyPressEventArgs e)
@@ -205,6 +209,10 @@ namespace SharpGL_project_1
                 case (char)80: //P- pause animation
                 case (char)112:
                     _sceneIsRotating = !_sceneIsRotating;
+                    //openGLControl_Resized(null, null);
+                    break;
+                case (char)115:
+                    z += 1.0f;
                     break;
             }
         }
