@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using SharpGL;
 using SharpGL.Enumerations;
+using SharpGL.SceneGraph.Cameras;
 using SharpGL.SceneGraph.Primitives;
 
 namespace SharpGL_project_1
@@ -66,14 +67,15 @@ namespace SharpGL_project_1
 
             //  Rotate
             gl.Rotate(_angleHorizontal, 0.0f, 1.0f, 0.0f);
-            gl.Rotate(_angleVertical, 1.0f, 0.0f, 0.0f);
+            gl.Rotate(-_angleVertical, 1.0f, 0.0f, 0.0f);
+            gl.Translate(-_cameraEye.X, -_cameraEye.Y, -_cameraEye.Z);
 
             DrawSportsHall(gl);
 
             //  Nudge the rotation.
             if (_sceneIsRotating)
             {
-                _angleHorizontal += 3.0f;
+                //_angleHorizontal += 3.0f;
             }
         }
 
@@ -225,12 +227,12 @@ namespace SharpGL_project_1
             _onUpperEdge = _onLowerEdge = _onLeftEdge = _onRightEdge = false;
 
             _mouseLeftButtonDown = false;
-            _mousePosition = new Point(Width / 2, Height / 2);
+            _mousePosition = new Point(Width/2, Height/2);
         }
 
         private float ToDegree(double arg)
         {
-            return (float)(arg * 180 / Math.PI);
+            return (float) (arg*180/Math.PI);
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace SharpGL_project_1
             gl.LoadIdentity();
 
             //  Create a perspective transformation.
-            gl.Perspective(Fov, (double)Width / (double)Height, ZNear, ZFar);
+            gl.Perspective(Fov, (double) Width/(double) Height, ZNear, ZFar);
 
             //  Use the 'look at' helper function to position and aim the camera.
             gl.LookAt(_cameraEye.X, _cameraEye.Y, _cameraEye.Z,
@@ -269,7 +271,7 @@ namespace SharpGL_project_1
 
             switch (e.KeyChar)
             {
-                #region options
+                    #region options
 
                 case 'p':
                 case 'P': //pause animation
@@ -280,37 +282,37 @@ namespace SharpGL_project_1
                     Close();
                     break;
 
-                #endregion
+                    #endregion
 
-                #region camera movement
+                    #region camera movement
 
                 case 's':
                 case 'S': //near
-                    _cameraEye -= _cameraCenter * StepSize;
+                    _cameraEye -= _cameraCenter*StepSize;
                     keyPressed = true;
                     break;
                 case 'w':
                 case 'W': //far
-                    _cameraEye += _cameraCenter * StepSize;
+                    _cameraEye += _cameraCenter*StepSize;
                     keyPressed = true;
                     break;
                 case 'z':
                 case 'Z': //up
-                    _cameraEye.Y += 10 * StepSize;
-                    _cameraCenter.Y += 10 * StepSize;
+                    _cameraEye.Y += 10*StepSize;
+                    _cameraCenter.Y += 10*StepSize;
                     keyPressed = true;
                     break;
                 case 'x':
                 case 'X': //down
-                    _cameraEye.Y -= 10 * StepSize;
-                    _cameraCenter.Y -= 10 * StepSize;
+                    _cameraEye.Y -= 10*StepSize;
+                    _cameraCenter.Y -= 10*StepSize;
                     keyPressed = true;
                     break;
                 case 'd':
                 case 'D': //right
                     Vector3 left = _cameraCenter.CrossProduct(_cameraUp);
                     left.Normalize();
-                    left *= 10 * StepSize;
+                    left *= 10*StepSize;
                     _cameraEye += left;
                     keyPressed = true;
                     break;
@@ -318,13 +320,12 @@ namespace SharpGL_project_1
                 case 'A': //left
                     Vector3 right = _cameraUp.CrossProduct(_cameraCenter);
                     right.Normalize();
-                    right *= 10 * StepSize;
+                    right *= 10*StepSize;
                     _cameraEye += right;
                     keyPressed = true;
                     break;
 
-                #endregion
-
+                    #endregion
 
             }
 
@@ -362,8 +363,8 @@ namespace SharpGL_project_1
 
                 _mousePosition = new Point(e.X, e.Y);
 
-                _angleHorizontal += DeltaX / 10.0f;
-                _angleVertical += DeltaY / 10.0f;
+                _angleHorizontal += DeltaX/20.0f;
+                _angleVertical += DeltaY/20.0f;
 
                 //if (DeltaX == 0)
                 //{
@@ -399,7 +400,7 @@ namespace SharpGL_project_1
                 //    _onLowerEdge = false;
                 //}
 
-                UpdateCameraVectors();
+                //UpdateCameraVectors();
             }
         }
 
@@ -424,6 +425,8 @@ namespace SharpGL_project_1
 
             _cameraUp = _cameraCenter.CrossProduct(Haxis);
             _cameraUp.Normalize();
+
+            openGLControl_Resized(null, null);
         }
     }
 }
