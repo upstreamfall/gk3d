@@ -66,7 +66,7 @@ namespace SharpGL_project_1
 
             //  Rotate
             gl.Rotate(_angleHorizontal, 0.0f, 1.0f, 0.0f);
-            gl.Rotate(-_angleVertical, 1.0f, 0.0f, 0.0f);
+            gl.Rotate(_angleVertical, 1.0f, 0.0f, 0.0f);
 
             DrawSportsHall(gl);
 
@@ -163,8 +163,6 @@ namespace SharpGL_project_1
             gl.End();
         }
 
-
-
         /// <summary>
         /// Handles the OpenGLInitialized event of the openGLControl control.
         /// </summary>
@@ -232,7 +230,7 @@ namespace SharpGL_project_1
 
         private float ToDegree(double arg)
         {
-            return (float)arg;
+            return (float)(arg * 180 / Math.PI);
         }
 
         /// <summary>
@@ -273,40 +271,51 @@ namespace SharpGL_project_1
             {
                 #region options
 
-                case (char)112: //P- pause animation
+                case 'p':
+                case 'P': //pause animation
                     _sceneIsRotating = !_sceneIsRotating;
+                    break;
+                case 'q':
+                case 'Q': //exit
+                    Close();
                     break;
 
                 #endregion
 
                 #region camera movement
 
-                case (char)115: //s- near
+                case 's':
+                case 'S': //near
                     _cameraEye -= _cameraCenter * StepSize;
                     keyPressed = true;
                     break;
-                case (char)119: //w- far
+                case 'w':
+                case 'W': //far
                     _cameraEye += _cameraCenter * StepSize;
                     keyPressed = true;
                     break;
-                case (char)122: //z- up
+                case 'z':
+                case 'Z': //up
                     _cameraEye.Y += 10 * StepSize;
                     _cameraCenter.Y += 10 * StepSize;
                     keyPressed = true;
                     break;
-                case (char)120: //x- down
+                case 'x':
+                case 'X': //down
                     _cameraEye.Y -= 10 * StepSize;
                     _cameraCenter.Y -= 10 * StepSize;
                     keyPressed = true;
                     break;
-                case (char)100: //d- right
+                case 'd':
+                case 'D': //right
                     Vector3 left = _cameraCenter.CrossProduct(_cameraUp);
                     left.Normalize();
                     left *= 10 * StepSize;
                     _cameraEye += left;
                     keyPressed = true;
                     break;
-                case (char)97: //a- left
+                case 'a':
+                case 'A': //left
                     Vector3 right = _cameraUp.CrossProduct(_cameraCenter);
                     right.Normalize();
                     right *= 10 * StepSize;
@@ -356,70 +365,65 @@ namespace SharpGL_project_1
                 _angleHorizontal += DeltaX / 10.0f;
                 _angleVertical += DeltaY / 10.0f;
 
-                if (DeltaX == 0)
-                {
-                    if (e.X <= margin)
-                    {
-                        _onLeftEdge = true;
-                    }
-                    else if (e.X >= (Width - margin))
-                    {
-                        _onRightEdge = true;
-                    }
-                }
-                else
-                {
-                    _onLeftEdge = false;
-                    _onRightEdge = false;
-                }
+                //if (DeltaX == 0)
+                //{
+                //    if (e.X <= margin)
+                //    {
+                //        _onLeftEdge = true;
+                //    }
+                //    else if (e.X >= (Width - margin))
+                //    {
+                //        _onRightEdge = true;
+                //    }
+                //}
+                //else
+                //{
+                //    _onLeftEdge = false;
+                //    _onRightEdge = false;
+                //}
 
-                if (DeltaY == 0)
-                {
-                    if (e.Y <= margin)
-                    {
-                        _onUpperEdge = true;
-                    }
-                    else if (e.Y >= (Height - margin))
-                    {
-                        _onLowerEdge = true;
-                    }
-                }
-                else
-                {
-                    _onUpperEdge = false;
-                    _onLowerEdge = false;
-                }
+                //if (DeltaY == 0)
+                //{
+                //    if (e.Y <= margin)
+                //    {
+                //        _onUpperEdge = true;
+                //    }
+                //    else if (e.Y >= (Height - margin))
+                //    {
+                //        _onLowerEdge = true;
+                //    }
+                //}
+                //else
+                //{
+                //    _onUpperEdge = false;
+                //    _onLowerEdge = false;
+                //}
 
-                bool shouldUpdate = false;
-
-                if (_onLeftEdge)
-                {
-                    _angleHorizontal -= 0.1f;
-                    shouldUpdate = true;
-                }
-                else if (_onRightEdge)
-                {
-                    _angleHorizontal += 0.1f;
-                    shouldUpdate = true;
-                }
-
-                if (_onUpperEdge)
-                {
-                    if (_angleVertical > -90.0f)
-                    {
-                        _angleVertical -= 0.1f;
-                        shouldUpdate = true;
-                    }
-                }
-                else if (_onLowerEdge)
-                {
-                    if (_angleVertical < 90.0f)
-                    {
-                        _angleVertical += 0.1f;
-                        shouldUpdate = true;
-                    }
-                }
+                UpdateCameraVectors();
             }
+        }
+
+        private void UpdateCameraVectors()
+        {
+            Vector3 Vaxis = new Vector3(0.0f, 1.0f, 0.0f);
+
+            // Rotate the view vector by the horizontal angle around the vertical axis
+            Vector3 View = new Vector3(1.0f, 0.0f, 0.0f);
+            //Vector3 View = _cameraCenter.CrossProduct(_cameraUp);
+            View.Rotate(_angleHorizontal, Vaxis);
+            View.Normalize();
+
+            // Rotate the view vector by the vertical angle around the horizontal axis
+            Vector3 Haxis = Vaxis.CrossProduct(View);
+            Haxis.Normalize();
+            View.Rotate(_angleVertical, Haxis);
+            View.Normalize();
+
+            _cameraCenter = View;
+            _cameraCenter.Normalize();
+
+            _cameraUp = _cameraCenter.CrossProduct(Haxis);
+            _cameraUp.Normalize();
         }
     }
 }
