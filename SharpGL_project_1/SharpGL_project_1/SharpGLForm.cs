@@ -227,12 +227,12 @@ namespace SharpGL_project_1
             _onUpperEdge = _onLowerEdge = _onLeftEdge = _onRightEdge = false;
 
             _mouseLeftButtonDown = false;
-            _mousePosition = new Point(Width/2, Height/2);
+            _mousePosition = new Point(Width / 2, Height / 2);
         }
 
         private float ToDegree(double arg)
         {
-            return (float) arg;
+            return (float)arg;
         }
 
         /// <summary>
@@ -254,10 +254,11 @@ namespace SharpGL_project_1
             gl.LoadIdentity();
 
             //  Create a perspective transformation.
-            gl.Perspective(Fov, (double) Width/(double) Height, ZNear, ZFar);
+            gl.Perspective(Fov, (double)Width / (double)Height, ZNear, ZFar);
 
             //  Use the 'look at' helper function to position and aim the camera.
-            gl.LookAt(_cameraEye.X, _cameraEye.Y, _cameraEye.Z, _cameraCenter.X, _cameraCenter.Y, _cameraCenter.Z,
+            gl.LookAt(_cameraEye.X, _cameraEye.Y, _cameraEye.Z,
+                _cameraCenter.X, _cameraCenter.Y, _cameraCenter.Z,
                 _cameraUp.X, _cameraUp.Y, _cameraUp.Z);
 
             //  Set the modelview matrix.
@@ -270,50 +271,50 @@ namespace SharpGL_project_1
 
             switch (e.KeyChar)
             {
-                    #region options
+                #region options
 
-                case (char) 112: //P- pause animation
+                case (char)112: //P- pause animation
                     _sceneIsRotating = !_sceneIsRotating;
                     break;
 
-                    #endregion
+                #endregion
 
-                    #region camera movement
+                #region camera movement
 
-                case (char) 119: //w- far
-                    _cameraEye -= _cameraCenter*StepSize;
+                case (char)115: //s- near
+                    _cameraEye -= _cameraCenter * StepSize;
                     keyPressed = true;
                     break;
-                case (char) 115: //s- near
-                    _cameraEye += _cameraCenter*StepSize;
+                case (char)119: //w- far
+                    _cameraEye += _cameraCenter * StepSize;
                     keyPressed = true;
                     break;
-                case (char) 122: //z- up
-                    _cameraEye.Y += 10*StepSize;
-                    _cameraCenter.Y += 10*StepSize;
+                case (char)122: //z- up
+                    _cameraEye.Y += 10 * StepSize;
+                    _cameraCenter.Y += 10 * StepSize;
                     keyPressed = true;
                     break;
-                case (char) 120: //x- down
-                    _cameraEye.Y -= 10*StepSize;
-                    _cameraCenter.Y -= 10*StepSize;
+                case (char)120: //x- down
+                    _cameraEye.Y -= 10 * StepSize;
+                    _cameraCenter.Y -= 10 * StepSize;
                     keyPressed = true;
                     break;
-                case (char) 97: //a- left
+                case (char)100: //d- right
                     Vector3 left = _cameraCenter.CrossProduct(_cameraUp);
                     left.Normalize();
-                    left *= 10*StepSize;
+                    left *= 10 * StepSize;
                     _cameraEye += left;
                     keyPressed = true;
                     break;
-                case (char) 100: //d- right
+                case (char)97: //a- left
                     Vector3 right = _cameraUp.CrossProduct(_cameraCenter);
                     right.Normalize();
-                    right *= 10*StepSize;
+                    right *= 10 * StepSize;
                     _cameraEye += right;
                     keyPressed = true;
                     break;
 
-                    #endregion
+                #endregion
 
 
             }
@@ -352,8 +353,8 @@ namespace SharpGL_project_1
 
                 _mousePosition = new Point(e.X, e.Y);
 
-                _angleHorizontal += DeltaX/10.0f;
-                _angleVertical += DeltaY/10.0f;
+                _angleHorizontal += DeltaX / 10.0f;
+                _angleVertical += DeltaY / 10.0f;
 
                 if (DeltaX == 0)
                 {
