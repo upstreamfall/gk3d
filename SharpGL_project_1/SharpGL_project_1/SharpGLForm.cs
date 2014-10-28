@@ -23,6 +23,7 @@ namespace SharpGL_project_1
 
         private float _angleHorizontal;
         private float _angleVertical;
+        private float _angleClockwise;
         private bool _onUpperEdge;
         private bool _onLowerEdge;
         private bool _onLeftEdge;
@@ -38,7 +39,7 @@ namespace SharpGL_project_1
         private const float StepSize = 0.1f;
 
         private Vector3 _cameraEye;
-        private Vector3 _cameraCenter;
+        private Vector3 _cameraTarget;
         private Vector3 _cameraUp;
 
         /// <summary>
@@ -193,10 +194,10 @@ namespace SharpGL_project_1
         private void CameraInitialization()
         {
             _cameraEye = new Vector3(0, 0, -10);
-            _cameraCenter = new Vector3(0, 0, 100);
+            _cameraTarget = new Vector3(0, 0, 100);
             _cameraUp = new Vector3(0, 1, 0);
 
-            Vector3 HorizontalTarget = new Vector3(_cameraCenter.X, 0.0f, _cameraCenter.Z);
+            Vector3 HorizontalTarget = new Vector3(_cameraTarget.X, 0.0f, _cameraTarget.Z);
             HorizontalTarget.Normalize();
 
             if (HorizontalTarget.Z >= 0.0f)
@@ -222,7 +223,8 @@ namespace SharpGL_project_1
                 }
             }
 
-            _angleVertical = -ToDegree(Math.Asin(_cameraCenter.Y));
+            _angleVertical = -ToDegree(Math.Asin(_cameraTarget.Y));
+            _angleClockwise = 0;
 
             _onUpperEdge = _onLowerEdge = _onLeftEdge = _onRightEdge = false;
 
@@ -258,8 +260,8 @@ namespace SharpGL_project_1
 
             //  Use the 'look at' helper function to position and aim the camera.
             gl.LookAt(_cameraEye.X, _cameraEye.Y, _cameraEye.Z,
-                //_cameraCenter.X, _cameraCenter.Y, _cameraCenter.Z, 
-                _cameraCenter.X + _cameraEye.X, _cameraCenter.Y + _cameraEye.Y, _cameraCenter.Z + _cameraEye.Z,
+                //_cameraTarget.X, _cameraTarget.Y, _cameraTarget.Z, 
+                _cameraTarget.X + _cameraEye.X, _cameraTarget.Y + _cameraEye.Y, _cameraTarget.Z + _cameraEye.Z,
                 _cameraUp.X, _cameraUp.Y, _cameraUp.Z);
 
             //  Set the modelview matrix.
@@ -289,29 +291,29 @@ namespace SharpGL_project_1
 
                 case 's':
                 case 'S': //near
-                    _cameraEye -= _cameraCenter*StepSize;
+                    _cameraEye -= _cameraTarget*StepSize;
                     keyPressed = true;
                     break;
                 case 'w':
                 case 'W': //far
-                    _cameraEye += _cameraCenter*StepSize;
+                    _cameraEye += _cameraTarget*StepSize;
                     keyPressed = true;
                     break;
                 case 'z':
                 case 'Z': //up
                     _cameraEye.Y += StepSize;
-                    _cameraCenter.Y += StepSize;
+                    _cameraTarget.Y += StepSize;
                     keyPressed = true;
                     break;
                 case 'x':
                 case 'X': //down
                     _cameraEye.Y -= StepSize;
-                    _cameraCenter.Y -= StepSize;
+                    _cameraTarget.Y -= StepSize;
                     keyPressed = true;
                     break;
                 case 'd':
                 case 'D': //right
-                    Vector3 left = _cameraCenter.CrossProduct(_cameraUp);
+                    Vector3 left = _cameraTarget.CrossProduct(_cameraUp);
                     left.Normalize();
                     left *= StepSize;
                     _cameraEye += left;
@@ -319,7 +321,7 @@ namespace SharpGL_project_1
                     break;
                 case 'a':
                 case 'A': //left
-                    Vector3 right = _cameraUp.CrossProduct(_cameraCenter);
+                    Vector3 right = _cameraUp.CrossProduct(_cameraTarget);
                     right.Normalize();
                     right *= StepSize;
                     _cameraEye += right;
@@ -327,11 +329,26 @@ namespace SharpGL_project_1
                     break;
 
                     #endregion
+                #region camera rotation
+                case 'c':
+                case 'C': //clockwise
+                    //_cameraUp.Roll(-StepSize);
+                    _angleClockwise -= StepSize;
+                    keyPressed = true;
+                    break;
+                case 'v':
+                case 'V': //counterclockwise
+                    //_cameraUp.Roll(StepSize);
+                    _angleClockwise += StepSize;
+                    keyPressed = true;
+                    break;
+                #endregion
 
             }
 
             if (keyPressed)
             {
+                UpdateCameraVectors();
                 openGLControl_Resized(null, null);
             }
         }
@@ -412,7 +429,7 @@ namespace SharpGL_project_1
 
             // Rotate the view vector by the horizontal angle around the vertical axis
             Vector3 View = new Vector3(1.0f, 0.0f, 0.0f);
-            //Vector3 View = _cameraCenter.CrossProduct(_cameraUp);
+            //Vector3 View = _cameraTarget.CrossProduct(_cameraUp);
             View.Rotate(_angleHorizontal, Vaxis);
             View.Normalize();
 
@@ -422,11 +439,13 @@ namespace SharpGL_project_1
             View.Rotate(_angleVertical, Haxis);
             View.Normalize();
 
-            _cameraCenter = View;
-            _cameraCenter.Normalize();
+            _cameraTarget = View;
+            _cameraTarget.Normalize();
 
-            _cameraUp = _cameraCenter.CrossProduct(Haxis);
+            _cameraUp = _cameraTarget.CrossProduct(Haxis);
             _cameraUp.Normalize();
+
+            _cameraUp.Roll(_angleClockwise);
 
             openGLControl_Resized(null, null);
         }
