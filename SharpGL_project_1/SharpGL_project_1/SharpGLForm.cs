@@ -9,7 +9,10 @@ using System.Text;
 using System.Windows.Forms;
 using SharpGL;
 using SharpGL.Enumerations;
+using SharpGL.SceneGraph;
+using SharpGL.SceneGraph.Assets;
 using SharpGL.SceneGraph.Cameras;
+using SharpGL.SceneGraph.Lighting;
 using SharpGL.SceneGraph.Primitives;
 
 namespace SharpGL_project_1
@@ -72,7 +75,7 @@ namespace SharpGL_project_1
             //gl.Translate(-_cameraEye.X, -_cameraEye.Y, -_cameraEye.Z);
 
             DrawSportsHall(gl);
-
+            
             //  Nudge the rotation.
             if (_sceneIsRotating)
             {
@@ -189,6 +192,33 @@ namespace SharpGL_project_1
             _sceneIsRotating = true;
 
             CameraInitialization();
+
+            LightInitialization();
+        }
+
+        private void LightInitialization()
+        {
+            OpenGL gl = openGLControl.OpenGL;
+
+            //gl.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            //gl.ShadeModel(ShadeModel.Smooth);
+            //float[] matAmbient = new float[]{0.2f, 0.2f, 0.2f, 0.2f};
+            //gl.Material(FrontFaceMode.ClockWise, , matAmbient);
+            //Material matA = new Material();
+            //matA.Ambient = Color.FromArgb(255, Color.Red);
+            
+
+            //simple
+            Light light = new Light();
+            GLColor ambientColor= new GLColor(0.2f, 0.2f, 0.2f, 1f);
+            GLColor color = new GLColor(0.5f, 0.5f, 0.5f, 1f);
+            light.Ambient = ambientColor;
+            light.Specular = color;
+            light.Diffuse = color;
+            light.Position = new Vertex(0, 0, -5);
+            light.GLCode = 10;
+            light.On = true;
+            light.Bind(gl);
         }
 
         private void CameraInitialization()
