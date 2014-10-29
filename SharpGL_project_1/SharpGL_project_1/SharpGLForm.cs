@@ -92,42 +92,54 @@ namespace SharpGL_project_1
             gl.Begin(OpenGL.GL_QUADS);
 
             //green
+            //top
             gl.Color(0.0f, 1.0f, 0.0f);
+            gl.Normal(0, -1, 0);
             gl.Vertex(1.0f, 1.0f, -3.0f);
             gl.Vertex(-1.0f, 1.0f, -3.0f);
             gl.Vertex(-1.0f, 1.0f, 1.0f);
             gl.Vertex(1.0f, 1.0f, 1.0f);
 
             //orange
+            //bottom
             gl.Color(1.0f, 0.5f, 0.0f);
+            gl.Normal(0, 1, 0);
             gl.Vertex(1.0f, -1.0f, 1.0f);
             gl.Vertex(-1.0f, -1.0f, 1.0f);
             gl.Vertex(-1.0f, -1.0f, -3.0f);
             gl.Vertex(1.0f, -1.0f, -3.0f);
 
             //red
+            //back
             gl.Color(1.0f, 0.0f, 0.0f);
+            gl.Normal(0, 0, -1);
             gl.Vertex(1.0f, 1.0f, 1.0f);
             gl.Vertex(-1.0f, 1.0f, 1.0f);
             gl.Vertex(-1.0f, -1.0f, 1.0f);
             gl.Vertex(1.0f, -1.0f, 1.0f);
 
             //yellow
+            //front
             gl.Color(1.0f, 1.0f, 0.0f);
+            gl.Normal(0, 0, 1);
             gl.Vertex(1.0f, -1.0f, -3.0f);
             gl.Vertex(-1.0f, -1.0f, -3.0f);
             gl.Vertex(-1.0f, 1.0f, -3.0f);
             gl.Vertex(1.0f, 1.0f, -3.0f);
 
             //blue
+            //right
             gl.Color(0.0f, 0.0f, 1.0f);
+            gl.Normal(-1, 0, 0);
             gl.Vertex(-1.0f, 1.0f, 1.0f);
             gl.Vertex(-1.0f, 1.0f, -3.0f);
             gl.Vertex(-1.0f, -1.0f, -3.0f);
             gl.Vertex(-1.0f, -1.0f, 1.0f);
 
             //pink
+            //left
             gl.Color(1.0f, 0.0f, 1.0f);
+            gl.Normal(1, 0, 0);
             gl.Vertex(1.0f, 1.0f, -3.0f);
             gl.Vertex(1.0f, 1.0f, 1.0f);
             gl.Vertex(1.0f, -1.0f, 1.0f);
@@ -209,16 +221,35 @@ namespace SharpGL_project_1
             
 
             //simple
-            Light light = new Light();
-            GLColor ambientColor= new GLColor(0.2f, 0.2f, 0.2f, 1f);
-            GLColor color = new GLColor(0.5f, 0.5f, 0.5f, 1f);
-            light.Ambient = ambientColor;
-            light.Specular = color;
-            light.Diffuse = color;
-            light.Position = new Vertex(0, 0, -5);
-            light.GLCode = 10;
-            light.On = true;
-            light.Bind(gl);
+            //Light light = new Light();
+            //GLColor ambientColor= new GLColor(0.2f, 0.2f, 0.2f, 1f);
+            //GLColor color = new GLColor(0.5f, 0.5f, 0.5f, 1f);
+            //light.Ambient = ambientColor;
+            //light.Specular = color;
+            //light.Diffuse = color;
+            //light.Position = new Vertex(0, 0, -5);
+            //light.GLCode = 10;
+            //light.On = true;
+            //light.Bind(gl);
+
+            //	Enable this light.
+            uint glCode = 10;
+            gl.Enable(OpenGL.GL_LIGHTING);
+            gl.Enable(glCode);
+
+            int[] ambient = new int[4] {255, 0, 0, 255};
+            int[] diffuse = new int[4] { 255, 0, 0, 255 };
+            int[] specular = new int[4] { 255, 0, 0, 255 };
+            Vector3 position = new Vector3(0, 0, -5);
+            //	The light is on, so set it's properties.
+            gl.Light(glCode, OpenGL.GL_AMBIENT, ambient);
+            gl.Light(glCode, OpenGL.GL_DIFFUSE, diffuse);
+            gl.Light(glCode, OpenGL.GL_SPECULAR, specular);
+            gl.Light(glCode, OpenGL.GL_POSITION, 
+                new float[] { (float)position.X, (float)position.Y, (float)position.Z, 1.0f });
+
+            //  180 degree cutoff gives an omnidirectional light.
+            gl.Light(glCode, OpenGL.GL_SPOT_CUTOFF, 180.0f);
         }
 
         private void CameraInitialization()
