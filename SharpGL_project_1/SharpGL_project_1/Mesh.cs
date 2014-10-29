@@ -22,8 +22,12 @@ namespace SharpGL_project_1
 
         public void Draw(OpenGL gl)
         {
+            gl.LoadIdentity();
+            gl.Translate(position.X, position.Y, position.Z);
+
             gl.Color(1.0f, 0.0f, 0.0f, 1.0f);
             gl.Begin(OpenGL.GL_TRIANGLES);
+            
             foreach (var group in result.Groups)
             {
                 foreach (var face in group.Faces)

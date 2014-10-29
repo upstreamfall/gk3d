@@ -81,12 +81,15 @@ namespace SharpGL_project_1
 
         private void DrawModels(OpenGL gl)
         {
+            //gl.Begin(OpenGL.GL_TRIANGLES);
             //DrawSportsHall(gl);
 
             foreach (var model in Models)
             {
                 model.Draw(gl);
             }
+
+            //gl.End();
         }
 
         /// <summary>
@@ -241,9 +244,12 @@ namespace SharpGL_project_1
             var fileStream = new FileStream("cube.obj", FileMode.Open);
             var result = objLoader.Load(fileStream);
 
-            Vector3 position = new Vector3(2, 2, 0);
+            Vector3 position = new Vector3(2, 2, 2);
+            Models.Add(new Mesh(result, position)); 
             
-            Models.Add(new Mesh(result, position));
+            position = new Vector3(-2, 2, 2);
+            Models.Add(new Mesh(result, position)); 
+            
         }
 
         private void LightInitialization()
