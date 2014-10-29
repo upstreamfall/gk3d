@@ -69,13 +69,15 @@ namespace SharpGL_project_1
             //  Load the identity matrix.
             gl.LoadIdentity();
 
+            //LightInitialization();
             //  Rotate
             //gl.Rotate(_angleHorizontal, 0.0f, 1.0f, 0.0f);
             //gl.Rotate(-_angleVertical, 1.0f, 0.0f, 0.0f);
             //gl.Translate(-_cameraEye.X, -_cameraEye.Y, -_cameraEye.Z);
 
             DrawSportsHall(gl);
-            
+            //drawColouredPyramid(gl);
+
             //  Nudge the rotation.
             if (_sceneIsRotating)
             {
@@ -121,10 +123,13 @@ namespace SharpGL_project_1
             //yellow
             //front
             gl.Color(1.0f, 1.0f, 0.0f);
-            gl.Normal(0, 0, 1);
+            gl.Normal(0, 0, -1);
             gl.Vertex(1.0f, -1.0f, -3.0f);
+            gl.Normal(0, 0, -1);
             gl.Vertex(-1.0f, -1.0f, -3.0f);
+            gl.Normal(0, 0, -1);
             gl.Vertex(-1.0f, 1.0f, -3.0f);
+            gl.Normal(0, 0, -1);
             gl.Vertex(1.0f, 1.0f, -3.0f);
 
             //blue
@@ -146,6 +151,25 @@ namespace SharpGL_project_1
             gl.Vertex(1.0f, -1.0f, -3.0f);
 
             gl.End();
+
+            //gl.Begin(OpenGL.GL_TRIANGLES);
+            ////gl.PushMatrix();
+            //gl.EnableClientState(OpenGL.GL_VERTEX_ARRAY);
+            //gl.EnableClientState(OpenGL.GL_NORMAL_ARRAY);
+            //gl.Color(1.0f, 1.0f, 0.0f);
+            //gl.VertexPointer(3, 0, new double[9] {1.0f, -1.0f, 0.0f,
+            //                                        -1.0f, -1.0f, 0.0f,
+            //                                        -1.0f, 1.0f, 0.0f});
+            //gl.NormalPointer(OpenGL.GL_FLOAT, 0, new float[9] { 0, 0, -1,
+            //                                                    0, 0, -1,
+            //                                                    0, 0, -1});
+            //gl.DrawElements(OpenGL.GL_TRIANGLES, 3, new uint[3] { 0, 1, 2 });
+
+            //gl.DisableClientState(OpenGL.GL_VERTEX_ARRAY);
+            //gl.DisableClientState(OpenGL.GL_NORMAL_ARRAY);
+
+            ////gl.PopMatrix();
+            //gl.End();
         }
 
         private void drawColouredPyramid(OpenGL gl)
@@ -218,7 +242,7 @@ namespace SharpGL_project_1
             //gl.Material(FrontFaceMode.ClockWise, , matAmbient);
             //Material matA = new Material();
             //matA.Ambient = Color.FromArgb(255, Color.Red);
-            
+
 
             //simple
             //Light light = new Light();
@@ -233,23 +257,26 @@ namespace SharpGL_project_1
             //light.Bind(gl);
 
             //	Enable this light.
-            uint glCode = 10;
+            uint glCode = OpenGL.GL_LIGHT0;
             gl.Enable(OpenGL.GL_LIGHTING);
             gl.Enable(glCode);
 
-            int[] ambient = new int[4] {255, 0, 0, 255};
-            int[] diffuse = new int[4] { 255, 0, 0, 255 };
-            int[] specular = new int[4] { 255, 0, 0, 255 };
-            Vector3 position = new Vector3(0, 0, -5);
+            float[] ambient = new float[] { 1.0f, 0.2f, 0.2f, 1.0f };
+            //int[] diffuse = new int[4] { 255, 0, 0, 255 };
+            //int[] specular = new int[4] { 255, 0, 0, 255 };
+            Vector3 position = new Vector3(-1, 0, -7);
             //	The light is on, so set it's properties.
             gl.Light(glCode, OpenGL.GL_AMBIENT, ambient);
-            gl.Light(glCode, OpenGL.GL_DIFFUSE, diffuse);
-            gl.Light(glCode, OpenGL.GL_SPECULAR, specular);
-            gl.Light(glCode, OpenGL.GL_POSITION, 
+            //gl.Light(glCode, OpenGL.GL_DIFFUSE, diffuse);
+            //gl.Light(glCode, OpenGL.GL_SPECULAR, specular);
+            gl.Light(glCode, OpenGL.GL_POSITION,
                 new float[] { (float)position.X, (float)position.Y, (float)position.Z, 1.0f });
 
             //  180 degree cutoff gives an omnidirectional light.
             gl.Light(glCode, OpenGL.GL_SPOT_CUTOFF, 180.0f);
+
+            //gl.Disable(glCode);
+            //gl.Disable(OpenGL.GL_LIGHTING);
         }
 
         private void CameraInitialization()
@@ -290,12 +317,12 @@ namespace SharpGL_project_1
             _onUpperEdge = _onLowerEdge = _onLeftEdge = _onRightEdge = false;
 
             _mouseLeftButtonDown = false;
-            _mousePosition = new Point(Width/2, Height/2);
+            _mousePosition = new Point(Width / 2, Height / 2);
         }
 
         private float ToDegree(double arg)
         {
-            return (float) (arg*180/Math.PI);
+            return (float)(arg * 180 / Math.PI);
         }
 
         /// <summary>
@@ -317,7 +344,7 @@ namespace SharpGL_project_1
             gl.LoadIdentity();
 
             //  Create a perspective transformation.
-            gl.Perspective(Fov, (double) Width/(double) Height, ZNear, ZFar);
+            gl.Perspective(Fov, (double)Width / (double)Height, ZNear, ZFar);
 
             //  Use the 'look at' helper function to position and aim the camera.
             gl.LookAt(_cameraEye.X, _cameraEye.Y, _cameraEye.Z,
@@ -335,7 +362,7 @@ namespace SharpGL_project_1
 
             switch (e.KeyChar)
             {
-                    #region options
+                #region options
 
                 case 'p':
                 case 'P': //pause animation
@@ -346,18 +373,18 @@ namespace SharpGL_project_1
                     Close();
                     break;
 
-                    #endregion
+                #endregion
 
-                    #region camera movement
+                #region camera movement
 
                 case 's':
                 case 'S': //near
-                    _cameraEye -= _cameraTarget*StepSize;
+                    _cameraEye -= _cameraTarget * StepSize;
                     keyPressed = true;
                     break;
                 case 'w':
                 case 'W': //far
-                    _cameraEye += _cameraTarget*StepSize;
+                    _cameraEye += _cameraTarget * StepSize;
                     keyPressed = true;
                     break;
                 case 'z':
@@ -389,7 +416,7 @@ namespace SharpGL_project_1
                     keyPressed = true;
                     break;
 
-                    #endregion
+                #endregion
                 #region camera rotation
                 case 'c':
                 case 'C': //clockwise
@@ -443,8 +470,8 @@ namespace SharpGL_project_1
 
                 _mousePosition = new Point(e.X, e.Y);
 
-                _angleHorizontal += DeltaX/20.0f;
-                _angleVertical += DeltaY/20.0f;
+                _angleHorizontal += DeltaX / 20.0f;
+                _angleVertical += DeltaY / 20.0f;
 
                 //if (DeltaX == 0)
                 //{
