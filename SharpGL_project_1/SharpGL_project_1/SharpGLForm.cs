@@ -233,10 +233,6 @@ namespace SharpGL_project_1
             gl.End();
         }
 
-        /// <summary>
-        /// Draw sports hall in the shape of a cuboid
-        /// </summary>
-        /// <param name="gl">openGL object</param>
         private void DrawSportsHall(OpenGL gl)
         {
             gl.Begin(OpenGL.GL_QUADS);
@@ -333,7 +329,7 @@ namespace SharpGL_project_1
         {
             var objLoaderFactory = new ObjLoaderFactory();
             var objLoader = objLoaderFactory.Create();
-            var fileStream = new FileStream("cube.obj", FileMode.Open);
+            var fileStream = new FileStream("humanoid_tri.obj", FileMode.Open);
             var result = objLoader.Load(fileStream);
 
             Vector3 position = new Vector3(2, 2, 2);
