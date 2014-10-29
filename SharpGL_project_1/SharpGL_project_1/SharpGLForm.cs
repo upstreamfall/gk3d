@@ -14,9 +14,11 @@ using SharpGL.Enumerations;
 using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Assets;
 using SharpGL.SceneGraph.Cameras;
+using SharpGL.SceneGraph.Core;
 using SharpGL.SceneGraph.Lighting;
 using SharpGL.SceneGraph.Primitives;
 using ObjLoader.Loader.Data.VertexData;
+using SharpGL.SceneGraph.Quadrics;
 
 namespace SharpGL_project_1
 {
@@ -42,7 +44,8 @@ namespace SharpGL_project_1
         private const float ZFar = 100.0f;
         private const float Fov = 45.0f;
 
-        private const float StepSize = 0.1f;
+        private const float StepSize = 0.2f;
+        private const float drawEps = 0.01f;
 
         private Vector3 _cameraEye;
         private Vector3 _cameraTarget;
@@ -79,17 +82,155 @@ namespace SharpGL_project_1
             DrawModels(gl);
         }
 
+        #region Draw Models
+
         private void DrawModels(OpenGL gl)
         {
-            //gl.Begin(OpenGL.GL_TRIANGLES);
-            //DrawSportsHall(gl);
+            DrawSportsHall(gl);
+            DrawCourt(gl);
+            DrawNet(gl);
 
             foreach (var model in Models)
             {
-                model.Draw(gl);
+                //model.Draw(gl);
             }
+        }
 
-            //gl.End();
+        private void DrawNet(OpenGL gl)
+        {
+            //gray
+            gl.Color(0.5, 0.5, 0.5);
+            
+            //far column
+            gl.LoadIdentity();
+            gl.Translate(-0.5, -10, -6);
+            //gl.Rotate(90.0, 1.0, 0.0, 0.0);
+            //gl.Cylinder(glQuadric, 1.0f, 1.0f, 10, 16, 20);
+            DrawNetColumn(gl);
+
+            //near column
+            gl.LoadIdentity();
+            gl.Translate(-0.5, -10, 7);
+            DrawNetColumn(gl);
+
+            //net
+            gl.LoadIdentity();
+            gl.Translate(-0.5, -10, 5.5f);
+            DrawNetPolygon(gl);
+        }
+
+        private void DrawNetPolygon(OpenGL gl)
+        {
+            gl.Begin(OpenGL.GL_QUADS);
+
+            //top
+            gl.Normal(0, 1, 0);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, -11.0f);
+            gl.Vertex(0.0f, 5.0f, -11.0f);
+
+            //bottom
+            //float eps = 2 * drawEps;
+            gl.Normal(0, -1, 0);
+            gl.Vertex(0.0f, 4.0f, 0.0f);
+            gl.Vertex(1.0f, 4.0f, 0.0f);
+            gl.Vertex(1.0f, 4.0f, -11.0f);
+            gl.Vertex(0.0f, 4.0f, -11.0f);
+
+            ////back
+            gl.Normal(0, 0, -1);
+            gl.Vertex(0.0f, 4.0f, -11.0f);
+            gl.Vertex(1.0f, 4.0f, -11.0f);
+            gl.Vertex(1.0f, 5.0f, -11.0f);
+            gl.Vertex(0.0f, 5.0f, -11.0f);
+
+            ////front
+            //gl.Normal(0, 0, 1);
+            gl.Vertex(0.0f, 4.0f, 0.0f);
+            gl.Vertex(1.0f, 4.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+
+            ////left
+            gl.Normal(-1, 0, 0);
+            gl.Vertex(0.0f, 4.0f, 0.0f);
+            gl.Vertex(0.0f, 4.0f, -11.0f);
+            gl.Vertex(0.0f, 5.0f, -11.0f);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+
+            ////right
+            gl.Normal(1, 0, 0);
+            gl.Vertex(1.0f, 4.0f, 0.0f);
+            gl.Vertex(1.0f, 4.0f, -11.0f);
+            gl.Vertex(1.0f, 5.0f, -11.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+
+            gl.End();
+        }
+
+        private void DrawNetColumn(OpenGL gl)
+        {
+            gl.Begin(OpenGL.GL_QUADS);
+
+            //top
+            gl.Normal(0, 1, 0);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, -1.0f);
+            gl.Vertex(0.0f, 5.0f, -1.0f);
+
+            //bottom
+            //float eps = 2 * drawEps;
+            gl.Normal(0, -1, 0);
+            gl.Vertex(0.0f, 0.0f + drawEps, 0.0f);
+            gl.Vertex(1.0f, 0.0f + drawEps, 0.0f);
+            gl.Vertex(1.0f, 0.0f + drawEps, -1.0f);
+            gl.Vertex(0.0f, 0.0f + drawEps, -1.0f);
+
+            ////back
+            gl.Normal(0, 0, -1);
+            gl.Vertex(0.0f, 0.0f, -1.0f);
+            gl.Vertex(1.0f, 0.0f, -1.0f);
+            gl.Vertex(1.0f, 5.0f, -1.0f);
+            gl.Vertex(0.0f, 5.0f, -1.0f);
+
+            //front
+            //gl.Normal(0, 0, 1);
+            gl.Vertex(0.0f, 0.0f, 0.0f);
+            gl.Vertex(1.0f, 0.0f, 0.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+
+            //left
+            gl.Normal(-1, 0, 0);
+            gl.Vertex(0.0f, 0.0f, 0.0f);
+            gl.Vertex(0.0f, 0.0f, -1.0f);
+            gl.Vertex(0.0f, 5.0f, -1.0f);
+            gl.Vertex(0.0f, 5.0f, 0.0f);
+
+            //right
+            gl.Normal(1, 0, 0);
+            gl.Vertex(1.0f, 0.0f, 0.0f);
+            gl.Vertex(1.0f, 0.0f, -1.0f);
+            gl.Vertex(1.0f, 5.0f, -1.0f);
+            gl.Vertex(1.0f, 5.0f, 0.0f);
+
+            gl.End();
+        }
+
+        private void DrawCourt(OpenGL gl)
+        {
+            gl.Begin(OpenGL.GL_QUADS);
+
+            gl.Color(1.0f, 0.5f, 0.0f, 1.0f);
+            gl.Normal(0, 1, 0);
+            gl.Vertex(10.0f, -10.0f + drawEps, 5.0f);
+            gl.Vertex(-10.0f, -10.0f + drawEps, 5.0f);
+            gl.Vertex(-10.0f, -10.0f + drawEps, -5.0f);
+            gl.Vertex(10.0f, -10.0f + drawEps, -5.0f);
+
+            gl.End();
         }
 
         /// <summary>
@@ -99,114 +240,65 @@ namespace SharpGL_project_1
         private void DrawSportsHall(OpenGL gl)
         {
             gl.Begin(OpenGL.GL_QUADS);
+
             //green
             //top
             gl.Color(0.0f, 1.0f, 0.0f, 1.0f);
-            gl.Normal(0, 1, 0);
-            gl.Vertex(1.0f, 1.0f, -3.0f);
-            gl.Vertex(-1.0f, 1.0f, -3.0f);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-
-            //orange
-            //bottom
-            gl.Color(1.0f, 0.5f, 0.0f, 1.0f);
             gl.Normal(0, -1, 0);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, -3.0f);
-            gl.Vertex(1.0f, -1.0f, -3.0f);
+            gl.Vertex(20.0f, 10.0f, -10.0f);
+            gl.Vertex(-20.0f, 10.0f, -10.0f);
+            gl.Vertex(-20.0f, 10.0f, 10.0f);
+            gl.Vertex(20.0f, 10.0f, 10.0f);
+
+            //gray
+            //bottom
+            gl.Color(0.0f, 0.7f, 0.5f, 1.0f);
+            gl.Normal(0, 1, 0);
+            gl.Vertex(20.0f, -10.0f, 10.0f);
+            gl.Vertex(-20.0f, -10.0f, 10.0f);
+            gl.Vertex(-20.0f, -10.0f, -10.0f);
+            gl.Vertex(20.0f, -10.0f, -10.0f);
 
             //red
             //back
-            gl.Color(1.0f, 0.0f, 0.0f, 1.0f);
-            gl.Normal(0, 0, 1);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
+            //gl.Color(1.0f, 0.0f, 0.0f, 1.0f);
+            //gl.Normal(0, 0, -1);
+            //gl.Vertex(20.0f, 10.0f, 10.0f);
+            //gl.Vertex(-20.0f, 10.0f, 10.0f);
+            //gl.Vertex(-20.0f, -10.0f, 10.0f);
+            //gl.Vertex(20.0f, -10.0f, 10.0f);
 
             //yellow
             //front
             gl.Color(1.0f, 1.0f, 0.0f, 1.0f);
             gl.Normal(0, 0, 1);
-            gl.Vertex(1.0f, -1.0f, -3.0f);
-            gl.Vertex(-1.0f, -1.0f, -3.0f);
-            gl.Vertex(-1.0f, 1.0f, -3.0f);
-            gl.Vertex(1.0f, 1.0f, -3.0f);
+            gl.Vertex(20.0f, -10.0f, -10.0f);
+            gl.Vertex(-20.0f, -10.0f, -10.0f);
+            gl.Vertex(-20.0f, 10.0f, -10.0f);
+            gl.Vertex(20.0f, 10.0f, -10.0f);
 
             //blue
-            //right
+            //left
             gl.Color(0.0f, 0.0f, 1.0f, 1.0f);
-            gl.Normal(-1, 0, 0);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, 1.0f, -3.0f);
-            gl.Vertex(-1.0f, -1.0f, -3.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
+            gl.Normal(1, 0, 0);
+            gl.Vertex(-20.0f, 10.0f, 10.0f);
+            gl.Vertex(-20.0f, 10.0f, -10.0f);
+            gl.Vertex(-20.0f, -10.0f, -10.0f);
+            gl.Vertex(-20.0f, -10.0f, 10.0f);
 
             //pink
-            //left
+            //right
             gl.Color(1.0f, 0.0f, 1.0f, 1.0f);
-            gl.Normal(1, 0, 0);
-            gl.Vertex(1.0f, 1.0f, -3.0f);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, -3.0f);
+            gl.Normal(-1, 0, 0);
+            gl.Vertex(20.0f, 10.0f, -10.0f);
+            gl.Vertex(20.0f, 10.0f, 10.0f);
+            gl.Vertex(20.0f, -10.0f, 10.0f);
+            gl.Vertex(20.0f, -10.0f, -10.0f);
 
             gl.End();
-
-            //gl.Begin(OpenGL.GL_TRIANGLES);
-            ////gl.PushMatrix();
-            //gl.EnableClientState(OpenGL.GL_VERTEX_ARRAY);
-            //gl.EnableClientState(OpenGL.GL_NORMAL_ARRAY);
-            //gl.Color(1.0f, 1.0f, 0.0f);
-            //gl.VertexPointer(3, 0, new double[9] {1.0f, -1.0f, 0.0f,
-            //                                        -1.0f, -1.0f, 0.0f,
-            //                                        -1.0f, 1.0f, 0.0f});
-            //gl.NormalPointer(OpenGL.GL_FLOAT, 0, new float[9] { 0, 0, -1,
-            //                                                    0, 0, -1,
-            //                                                    0, 0, -1});
-            //gl.DrawElements(OpenGL.GL_TRIANGLES, 3, new uint[3] { 0, 1, 2 });
-
-            //gl.DisableClientState(OpenGL.GL_VERTEX_ARRAY);
-            //gl.DisableClientState(OpenGL.GL_NORMAL_ARRAY);
-
-            ////gl.PopMatrix();
-            //gl.End();
         }
 
-        private void drawColouredPyramid(OpenGL gl)
-        {
-            gl.Begin(OpenGL.GL_TRIANGLES);
-            gl.Color(1.0f, 0.0f, 0.0f);
-            gl.Vertex(0.0f, 1.0f, 0.0f);
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.Color(0.0f, 0.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-
-            gl.Color(1.0f, 0.0f, 0.0f);
-            gl.Vertex(0.0f, 1.0f, 0.0f);
-            gl.Color(0.0f, 0.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(1.0f, -1.0f, -1.0f);
-
-            gl.Color(1.0f, 0.0f, 0.0f);
-            gl.Vertex(0.0f, 1.0f, 0.0f);
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(1.0f, -1.0f, -1.0f);
-            gl.Color(0.0f, 0.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, -1.0f);
-
-            gl.Color(1.0f, 0.0f, 0.0f);
-            gl.Vertex(0.0f, 1.0f, 0.0f);
-            gl.Color(0.0f, 0.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, -1.0f);
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.End();
-        }
+        #endregion
 
         /// <summary>
         /// Handles the OpenGLInitialized event of the openGLControl control.
@@ -284,8 +376,8 @@ namespace SharpGL_project_1
 
         private void CameraInitialization()
         {
-            _cameraEye = new Vector3(0, 0, -10);
-            _cameraTarget = new Vector3(0, 0, 100);
+            _cameraEye = new Vector3(0, 0, 40);
+            _cameraTarget = new Vector3(0, 0, -100);
             _cameraUp = new Vector3(0, 1, 0);
 
             Vector3 HorizontalTarget = new Vector3(_cameraTarget.X, 0.0f, _cameraTarget.Z);
@@ -373,6 +465,7 @@ namespace SharpGL_project_1
                 case 'P': //pause animation
                     _sceneIsRotating = !_sceneIsRotating;
                     break;
+                case (char)27:    //ESC
                 case 'q':
                 case 'Q': //exit
                     Close();
