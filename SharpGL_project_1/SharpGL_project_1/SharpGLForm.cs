@@ -44,7 +44,7 @@ namespace SharpGL_project_1
         private const float ZFar = 100.0f;
         private const float Fov = 45.0f;
 
-        private const float StepSize = 0.2f;
+        private const float StepSize = 0.5f;
         private const float drawEps = 0.01f;
 
         private Vector3 _cameraEye;
@@ -76,6 +76,15 @@ namespace SharpGL_project_1
             //  Clear the color and depth buffer.
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
+            float[] position = new float[] { 0.0f, 0.0f, 1.0f };
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_POSITION, position);
+            float[] direction = new float[] { 0.0f, 0.0f, -1.0f };
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPOT_DIRECTION, direction);
+            float[] color = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
+
+            //gl.Enable(OpenGL.GL_LIGHTING);
+            gl.Enable(OpenGL.GL_LIGHT0);
+
             //  Load the identity matrix.
             gl.LoadIdentity();
 
@@ -92,7 +101,7 @@ namespace SharpGL_project_1
 
             foreach (var model in Models)
             {
-                //model.Draw(gl);
+                model.Draw(gl);
             }
         }
 
@@ -235,62 +244,70 @@ namespace SharpGL_project_1
 
         private void DrawSportsHall(OpenGL gl)
         {
-            gl.Begin(OpenGL.GL_QUADS);
-
             //green
             //top
+            gl.Begin(OpenGL.GL_QUADS);
             gl.Color(0.0f, 1.0f, 0.0f, 1.0f);
             gl.Normal(0, -1, 0);
-            gl.Vertex(20.0f, 10.0f, -10.0f);
-            gl.Vertex(-20.0f, 10.0f, -10.0f);
-            gl.Vertex(-20.0f, 10.0f, 10.0f);
             gl.Vertex(20.0f, 10.0f, 10.0f);
+            gl.Vertex(-20.0f, 10.0f, 10.0f);
+            gl.Vertex(-20.0f, 10.0f, -10.0f);
+            gl.Vertex(20.0f, 10.0f, -10.0f);
+            gl.End();
 
             //gray
             //bottom
+            gl.Begin(OpenGL.GL_QUADS);
             gl.Color(0.0f, 0.7f, 0.5f, 1.0f);
             gl.Normal(0, 1, 0);
             gl.Vertex(20.0f, -10.0f, 10.0f);
             gl.Vertex(-20.0f, -10.0f, 10.0f);
             gl.Vertex(-20.0f, -10.0f, -10.0f);
             gl.Vertex(20.0f, -10.0f, -10.0f);
+            gl.End();
 
             //red
             //back
+            //gl.Begin(OpenGL.GL_QUADS);
             //gl.Color(1.0f, 0.0f, 0.0f, 1.0f);
             //gl.Normal(0, 0, -1);
             //gl.Vertex(20.0f, 10.0f, 10.0f);
             //gl.Vertex(-20.0f, 10.0f, 10.0f);
             //gl.Vertex(-20.0f, -10.0f, 10.0f);
             //gl.Vertex(20.0f, -10.0f, 10.0f);
+            //gl.End();
 
             //yellow
             //front
+            gl.Begin(OpenGL.GL_QUADS);
             gl.Color(1.0f, 1.0f, 0.0f, 1.0f);
             gl.Normal(0, 0, 1);
-            gl.Vertex(20.0f, -10.0f, -10.0f);
-            gl.Vertex(-20.0f, -10.0f, -10.0f);
-            gl.Vertex(-20.0f, 10.0f, -10.0f);
             gl.Vertex(20.0f, 10.0f, -10.0f);
+            gl.Vertex(-20.0f, 10.0f, -10.0f);
+            gl.Vertex(-20.0f, -10.0f, -10.0f);
+            gl.Vertex(20.0f, -10.0f, -10.0f);
+            gl.End();
 
             //blue
             //left
+            gl.Begin(OpenGL.GL_QUADS);
             gl.Color(0.0f, 0.0f, 1.0f, 1.0f);
             gl.Normal(1, 0, 0);
             gl.Vertex(-20.0f, 10.0f, 10.0f);
             gl.Vertex(-20.0f, 10.0f, -10.0f);
             gl.Vertex(-20.0f, -10.0f, -10.0f);
             gl.Vertex(-20.0f, -10.0f, 10.0f);
+            gl.End();
 
             //pink
             //right
+            gl.Begin(OpenGL.GL_QUADS);
             gl.Color(1.0f, 0.0f, 1.0f, 1.0f);
             gl.Normal(-1, 0, 0);
             gl.Vertex(20.0f, 10.0f, -10.0f);
             gl.Vertex(20.0f, 10.0f, 10.0f);
             gl.Vertex(20.0f, -10.0f, 10.0f);
             gl.Vertex(20.0f, -10.0f, -10.0f);
-
             gl.End();
         }
 
@@ -312,6 +329,9 @@ namespace SharpGL_project_1
             //  Get the OpenGL object.
             OpenGL gl = openGLControl.OpenGL;
 
+            //gl.Enable(OpenGL.GL_COLOR_MATERIAL);
+            gl.ColorMaterial(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_AMBIENT_AND_DIFFUSE);
+
             //  Set the clear color.
             gl.ClearColor(0, 0, 0, 0);
 
@@ -320,9 +340,10 @@ namespace SharpGL_project_1
 
             CameraInitialization();
 
-            LightInitialization();
+            //LightInitialization(gl);
 
             ModelsLoading();
+
         }
 
         private void ModelsLoading()
@@ -331,43 +352,65 @@ namespace SharpGL_project_1
             var objLoader = objLoaderFactory.Create();
             var fileStream = new FileStream("humanoid_tri.obj", FileMode.Open);
             var result = objLoader.Load(fileStream);
+            fileStream.Close();
 
-            Vector3 position = new Vector3(2, 2, 2);
-            Models.Add(new Mesh(result, position)); 
-            
-            position = new Vector3(-2, 2, 2);
-            Models.Add(new Mesh(result, position)); 
-            
+            //man1
+            Vector3 position = new Vector3(10, -11.5f, -5);
+            Vector3 rotation = new Vector3(-1, 0, 0);
+            float rotationAngle = 90.0f;
+            Vector3 scale = new Vector3(1.0f, 0.5f, 0.5f);
+            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale));
+
+            //man2
+            position = new Vector3(10, -11.5f, 7);
+            rotation = new Vector3(-1, 0, 0);
+            rotationAngle = 90.0f;
+            scale = new Vector3(1.0f, 0.5f, 0.5f);
+            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale));
+
+            objLoader = objLoaderFactory.Create();
+            fileStream = new FileStream("teapot.obj", FileMode.Open);
+            result = objLoader.Load(fileStream);
+            fileStream.Close();
+
+            //man1
+            position = new Vector3(-2, 1, 1);
+            rotation = new Vector3(0, 1, 0);
+            rotationAngle = 360.0f;
+            scale = new Vector3(0.05f, 0.05f, 0.05f);
+            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale));
+
+            objLoader = objLoaderFactory.Create();
+            fileStream = new FileStream("cube.obj", FileMode.Open);
+            result = objLoader.Load(fileStream);
+            fileStream.Close();
+
+            //man1
+            position = new Vector3(-10, -10.0f, 1);
+            rotation = new Vector3(0, 1, 0);
+            rotationAngle = 360.0f;
+            scale = new Vector3(2.0f, 2.0f, 2.0f);
+            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale));
         }
 
-        private void LightInitialization()
+        private void LightInitialization(OpenGL gl)
         {
-            OpenGL gl = openGLControl.OpenGL;
-            
             gl.Enable(OpenGL.GL_COLOR_MATERIAL);
-            gl.ColorMaterial(OpenGL.GL_FRONT, OpenGL.GL_AMBIENT_AND_DIFFUSE);
+            gl.ColorMaterial(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_AMBIENT_AND_DIFFUSE);
+            
+            //reflektor1
+            float[] color = new float[] { 0.0f, 1.0f, 0.5f, 1.0f };
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_DIFFUSE, color);
+            float[] position = new float[] {-2.0f, 5.0f, 0.0f, 1.0f};
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_POSITION, position);
+            float[] direction = new float[] {-10.0f, 5.0f, 5.0f};
+            //gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPOT_DIRECTION, direction);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPOT_CUTOFF, 5.0f);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPOT_EXPONENT, 10.0f);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_LINEAR_ATTENUATION, 0.01f);
 
-            gl.Material(OpenGL.GL_FRONT, OpenGL.GL_SPECULAR, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-            gl.Material(OpenGL.GL_FRONT, OpenGL.GL_EMISSION, new float[] { 0.0f, 0.0f, 0.0f, 1.0f });
-
-            //new float[] {1.0f, 1.0f, 1.0f, 1.0f}
-            //new float[] {0.0f, 0.0f, 0.0f, 1.0f}
-
-            //reflektor
-            float[] specular = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
-            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPECULAR, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-            float[] ambient = new float[] { 0.2f, 0.2f, 0.2f, 1.0f };
-            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_AMBIENT, ambient);
-            float[] diffuse = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
-                //new float[] { 0.8f, 0.8f, 0.8f, 1.0f};
-            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_DIFFUSE, diffuse);
-            float[] light_position = new float[] { 1.6f, 1.4f, 0f, 1.0f};
-            gl.Light( OpenGL.GL_LIGHT0, OpenGL.GL_POSITION, light_position);
-            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPOT_CUTOFF, 45);
-            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_LINEAR_ATTENUATION, 0.2f);
-
-            //gl.Enable(OpenGL.GL_LIGHTING); 
-            gl.Enable(OpenGL.GL_LIGHT0);
+            //gl.Enable(OpenGL.GL_LIGHTING);
+            //gl.Enable(OpenGL.GL_LIGHT0);
         }
 
         private void CameraInitialization()
