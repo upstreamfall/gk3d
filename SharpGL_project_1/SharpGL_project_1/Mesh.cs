@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using ObjLoader.Loader.Data.VertexData;
@@ -15,8 +16,9 @@ namespace SharpGL_project_1
         private Vector3 rotation;
         private float rotationAngle;
         private Vector3 scale;
+        private float[] color;
 
-        public Mesh(ObjLoader.Loader.Loaders.LoadResult result, Vector3 position, Vector3 rotation, float rotationAngle, Vector3 scale)
+        public Mesh(ObjLoader.Loader.Loaders.LoadResult result, Vector3 position, Vector3 rotation, float rotationAngle, Vector3 scale, float[] color)
         {
             // TODO: Complete member initialization
             this.result = result;
@@ -24,6 +26,7 @@ namespace SharpGL_project_1
             this.rotation = rotation;
             this.rotationAngle = rotationAngle;
             this.scale = scale;
+            this.color = color;
         }
 
         public void Draw(OpenGL gl)
@@ -33,7 +36,7 @@ namespace SharpGL_project_1
             gl.Rotate(rotationAngle, rotation.X, rotation.Y, rotation.Z);
             gl.Scale(scale.X, scale.Y, scale.Z);
 
-            gl.Color(1.0f, 0.0f, 0.0f, 1.0f);
+            gl.Color(color[0], color[1], color[2], color[3]);
             gl.Begin(OpenGL.GL_TRIANGLES);
             
             foreach (var group in result.Groups)
