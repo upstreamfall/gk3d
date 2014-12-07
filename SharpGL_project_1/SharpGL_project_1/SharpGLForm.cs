@@ -56,6 +56,10 @@ namespace SharpGL_project_1
 
         private List<Mesh> Models;
 
+        private float[] fog_color = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
+
+        private float _wireframeShiftX = 0.0f;
+
         public SharpGLForm()
         {
             Models = new List<Mesh>();
@@ -70,16 +74,32 @@ namespace SharpGL_project_1
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
+            //gl.ClearColor(fog_color[0], fog_color[1], fog_color[2], 1.0f);
+
             gl.LoadIdentity();
 
-            colorBlue[2] += addBlue;
-            if (colorBlue[2] >= 1 || colorBlue[2] <= 0)
-            {
-                addBlue *= -1;
-            }
-            gl.Light(OpenGL.GL_LIGHT1, OpenGL.GL_DIFFUSE, colorBlue);
-            gl.Light(OpenGL.GL_LIGHT1, OpenGL.GL_SPECULAR, colorBlue);
+            //colorBlue[2] += addBlue;
+            //if (colorBlue[2] >= 1 || colorBlue[2] <= 0)
+            //{
+            //    addBlue *= -1;
+            //}
+            //gl.Light(OpenGL.GL_LIGHT1, OpenGL.GL_DIFFUSE, colorBlue);
+            //gl.Light(OpenGL.GL_LIGHT1, OpenGL.GL_SPECULAR, colorBlue);
 
+            
+            gl.Enable(OpenGL.GL_CLIP_PLANE0);
+
+            gl.Translate(_wireframeShiftX, 0.0f, 0.0f);
+            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
+            gl.ClipPlane(OpenGL.GL_CLIP_PLANE0, new double[] { 1.0f, 0.0f, 0.0f, 0.0f });
+            gl.LoadIdentity(); 
+            DrawModels(gl);
+
+            gl.LoadIdentity(); 
+            gl.Translate(_wireframeShiftX, 0.0f, 0.0f);
+            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
+            gl.ClipPlane(OpenGL.GL_CLIP_PLANE0, new double[] { -1.0f, 0.0f, 0.0f, 0.0f });
+            gl.LoadIdentity(); 
             DrawModels(gl);
         }
 
@@ -333,6 +353,14 @@ namespace SharpGL_project_1
 
             ModelsLoading();
 
+            gl.Enable(OpenGL.GL_FOG);
+            gl.Fog(OpenGL.GL_FOG_COLOR, fog_color);
+            gl.Fog(OpenGL.GL_FOG_START, 1.0f);
+            gl.Fog(OpenGL.GL_FOG_END, 100.0f);
+            gl.Fog(OpenGL.GL_FOG_DENSITY, 0.10f); 
+            gl.Fog(OpenGL.GL_FOG_MODE, OpenGL.GL_EXP);
+            //gl.Fog(OpenGL.GL_FOG_MODE, OpenGL.GL_LINEAR);
+
         }
 
         private void ModelsLoading()
@@ -344,62 +372,64 @@ namespace SharpGL_project_1
             fileStream.Close();
 
             //man1
-            float[] color = new float[] {1.0f, 0.0f, 0.0f, 1.0f};
+            float[] color = new float[] { 1.0f, 0.0f, 0.0f, 1.0f };
             Vector3 position = new Vector3(10, -11.5f, -5);
             Vector3 rotation = new Vector3(-1, 0, 0);
             float rotationAngle = 90.0f;
             Vector3 scale = new Vector3(1.0f, 0.5f, 0.5f);
-            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
+            //Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
 
-            //man2
-            color = new float[] { 0.0f, 1.0f, 0.0f, 1.0f };
-            position = new Vector3(10, -11.5f, 7);
-            rotation = new Vector3(-1, 0, 0);
-            rotationAngle = 90.0f;
-            scale = new Vector3(1.0f, 0.5f, 0.5f);
-            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
+            ////man2
+            //color = new float[] { 0.0f, 1.0f, 0.0f, 1.0f };
+            //position = new Vector3(10, -11.5f, 7);
+            //rotation = new Vector3(-1, 0, 0);
+            //rotationAngle = 90.0f;
+            //scale = new Vector3(1.0f, 0.5f, 0.5f);
+            //Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
 
             objLoader = objLoaderFactory.Create();
             fileStream = new FileStream("teapot.obj", FileMode.Open);
             result = objLoader.Load(fileStream);
             fileStream.Close();
 
-            color = new float[] { 0.0f, 0.0f, 1.0f, 1.0f };
-            position = new Vector3(-30, 1, 1);
-            rotation = new Vector3(0, 1, 0);
+            color = new float[] { 0.0f, 0.0f, 1.0f, 1.0f };            
+            //position = new Vector3(-30, 1, 1);
+            //rotation = new Vector3(0, 1, 0);
             rotationAngle = 360.0f;
-            scale = new Vector3(0.05f, 0.05f, 0.05f);
+            scale = new Vector3(0.15f, 0.15f, 0.15f);
+
+            position = new Vector3(5, 0, -5);
             Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
 
-            objLoader = objLoaderFactory.Create();
-            fileStream = new FileStream("sphere.obj", FileMode.Open);
-            result = objLoader.Load(fileStream);
-            fileStream.Close();
+            //objLoader = objLoaderFactory.Create();
+            //fileStream = new FileStream("sphere.obj", FileMode.Open);
+            //result = objLoader.Load(fileStream);
+            //fileStream.Close();
 
-            color = new float[] { 0.5f, 0.5f, 0.5f, 1.0f };
-            position = new Vector3(-10.0f, 0.0f + drawEps, 1.0f);
-            rotation = new Vector3(0, 1.0f, 0);
-            rotationAngle = 360.0f;
-            scale = new Vector3(1.0f, 1.0f, 1.0f);
-            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
+            //color = new float[] { 0.5f, 0.5f, 0.5f, 1.0f };
+            //position = new Vector3(-10.0f, 0.0f + drawEps, 1.0f);
+            //rotation = new Vector3(0, 1.0f, 0);
+            //rotationAngle = 360.0f;
+            //scale = new Vector3(1.0f, 1.0f, 1.0f);
+            //Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
 
 
-            objLoader = objLoaderFactory.Create();
-            fileStream = new FileStream("cube.obj", FileMode.Open);
-            result = objLoader.Load(fileStream);
-            fileStream.Close();
+            //objLoader = objLoaderFactory.Create();
+            //fileStream = new FileStream("cube.obj", FileMode.Open);
+            //result = objLoader.Load(fileStream);
+            //fileStream.Close();
 
-            color = new float[] { 0.5f, 0.5f, 0.5f, 1.0f };
-            position = new Vector3(-10.0f, -9.0f + drawEps, 1.0f);
-            rotation = new Vector3(0, 1.0f, 0);
-            rotationAngle = 360.0f;
-            scale = new Vector3(1.0f, 1.0f, 1.0f);
-            Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
+            //color = new float[] { 0.5f, 0.5f, 0.5f, 1.0f };
+            //position = new Vector3(-10.0f, -9.0f + drawEps, 1.0f);
+            //rotation = new Vector3(0, 1.0f, 0);
+            //rotationAngle = 360.0f;
+            //scale = new Vector3(1.0f, 1.0f, 1.0f);
+            //Models.Add(new Mesh(result, position, rotation, rotationAngle, scale, color));
         }
 
         private void LightInitialization(OpenGL gl)
         {
-            gl.Enable(OpenGL.GL_COLOR_MATERIAL);
+            //gl.Enable(OpenGL.GL_COLOR_MATERIAL);
             gl.ColorMaterial(OpenGL.GL_FRONT, OpenGL.GL_AMBIENT_AND_DIFFUSE);
             float[] qaBlack = new float[]{0.2f, 0.2f, 0.2f, 1.0f};
             float[] qaGreen = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
@@ -447,10 +477,10 @@ namespace SharpGL_project_1
             gl.Light(OpenGL.GL_LIGHT3, OpenGL.GL_SPOT_EXPONENT, 0.0f);
             gl.Light(OpenGL.GL_LIGHT3, OpenGL.GL_QUADRATIC_ATTENUATION, 0.01f);
 
-            gl.Enable(OpenGL.GL_LIGHTING);
-            gl.Enable(OpenGL.GL_LIGHT0);
-            gl.Enable(OpenGL.GL_LIGHT1);
-            gl.Enable(OpenGL.GL_LIGHT3);
+            //gl.Enable(OpenGL.GL_LIGHTING);
+            //gl.Enable(OpenGL.GL_LIGHT0);
+            //gl.Enable(OpenGL.GL_LIGHT1);
+            //gl.Enable(OpenGL.GL_LIGHT3);
         }
 
         private void CameraInitialization()
@@ -526,7 +556,6 @@ namespace SharpGL_project_1
             switch (e.KeyChar)
             {
                 #region options
-
                 case 'p':
                 case 'P': //pause animation
                     _sceneIsRotating = !_sceneIsRotating;
@@ -540,7 +569,6 @@ namespace SharpGL_project_1
                 #endregion
 
                 #region camera movement
-
                 case 's':
                 case 'S': //near
                     _cameraEye -= _cameraTarget * StepSize;
@@ -581,6 +609,7 @@ namespace SharpGL_project_1
                     break;
 
                 #endregion
+
                 #region camera rotation
                 case 'c':
                 case 'C': //clockwise
@@ -594,6 +623,14 @@ namespace SharpGL_project_1
                     break;
                 #endregion
 
+                #region wireframe
+                case '[':
+                    _wireframeShiftX -= 1.0f;
+                    break;
+                case ']':
+                    _wireframeShiftX += 1.0f;
+                    break;
+                #endregion
             }
 
             if (keyPressed)
